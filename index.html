@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantum File Forge ⚡</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.js"></script> 
+
+    <style>
+        body {
+            /* Deeper, more complex background */
+            background: #0d1117; 
+            color: #e5e7eb;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* HEADER GLOW */
+        .title-glow {
+            text-shadow: 0 0 5px rgba(56, 189, 248, 0.5), 0 0 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .tab-btn {
+            padding: 14px 28px;
+            border-radius: 12px 12px 0 0;
+            font-weight: 700;
+            color: #94a3b8; /* Slate gray */
+            background: #1f2937;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth Cubic transition */
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-bottom: none;
+        }
+
+        .tab-btn.active {
+            color: #67e8f9; /* Cyan Active Color */
+            background: #1e293b;
+            border-top: 2px solid #06b6d4; /* Vivid Cyan */
+            border-left: 2px solid #06b6d4;
+            border-right: 2px solid #06b6d4;
+            box-shadow: 0 -4px 15px rgba(6, 182, 212, 0.3);
+            z-index: 10; 
+        }
+
+        .tool-card {
+            /* Enhanced Sci-Fi Card Look */
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(17, 24, 39, 0.9));
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(6, 182, 212, 0.08); /* Subtle cyan outer glow */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 1px solid #334155; /* Slate border */
+            margin: 10px;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 50px rgba(6, 182, 212, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            color: #111827;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        /* Hover effect for process buttons (futuristic pulse) */
+        .btn-process {
+            background: #06b6d4; /* Vivid Cyan */
+            color: #0d1117;
+        }
+
+        .btn-process:hover {
+            background: #34d399; /* Emerald */
+            color: #0d1117;
+            box-shadow: 0 0 10px #34d399;
+        }
+
+        .btn-process:active {
+            transform: scale(0.98);
+        }
+        
+        /* Styling for inputs and selects */
+        .futuristic-input {
+            background: #0f172a; /* Deeper input field */
+            border: 1px solid #334155;
+            color: #f1f5f9;
+            padding: 14px; /* Slightly larger padding */
+            border-radius: 12px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            font-size: 1rem;
+        }
+
+        .futuristic-input:focus {
+            border-color: #67e8f9;
+            outline: none;
+            box-shadow: 0 0 8px #67e8f9;
+        }
+
+        /* Custom File Input Container */
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #0f172a;
+            border: 1px solid #334155;
+        }
+
+        .custom-file-upload {
+            flex-grow: 1;
+            color: #e2e8f0;
+            padding: 14px 18px;
+            cursor: pointer;
+            text-align: left;
+            transition: background-color 0.3s;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            font-weight: 500;
+        }
+
+        .custom-file-upload:hover {
+            background: #1e293b;
+        }
+
+        .clear-file-btn {
+            color: #f87171; /* Light red */
+            padding: 14px 18px;
+            background: #273040;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+            border-left: 1px solid #334155;
+            font-weight: bold;
+            border-radius: 10px;
+            margin: 3px;
+        }
+
+        .clear-file-btn:hover {
+            background: #b91c1c; /* Darker red on hover */
+            color: white;
+        }
+        
+        /* Status message styling */
+        #status-message {
+            min-height: 2.5rem; /* Ensure consistent height */
+            font-weight: 600;
+            padding: 8px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status-success {
+            background-color: #155724; 
+            color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #721c24; 
+            color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-processing {
+            background-color: #0c5460;
+            color: #d1ecf1;
+            border: 1px solid #bee5eb;
+        }
+        
+        #pdfCanvas {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="p-8 md:p-12">
+
+    <h1 class="text-5xl md:text-6xl text-center font-extrabold mb-12 text-cyan-300 title-glow">
+        ⚡ Quantum File Forge ⚡
+    </h1>
+    
+    <canvas id="pdfCanvas"></canvas>
+
+    <div class="max-w-6xl mx-auto">
+        
+        <div id="status-message" class="hidden"></div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div id="tab-image" style="margin-left:12px; width:45%;" class="tab-btn active" onclick="showTab('image')">
+                🖼️ Image & Raster Tools
+            </div>
+            <div id="tab-pdf" style="margin-right:12px; width: 45%;"  class="tab-btn" onclick="showTab('pdf')">
+                📄 PDF Vector Optimization
+            </div>
+        </div>
+
+        <div class="mt-8">
+            
+            <div id="content-image" class="tab-content grid grid-cols-1 lg:grid-cols-2 gap-10">
+                
+                <div class="tool-card">
+                    <h3 class="text-3xl font-bold mb-6 text-teal-300">🖼️ Image ➝ PDF Converter</h3>
+                    <p class="text-sm text-slate-400 mb-6">Convert a single image file (JPG/PNG) into a high-quality, print-ready PDF document.</p>
+
+                    <div class="file-input-wrapper mb-5" style="margin-bottom: 10px;">
+                        <label for="imgToPdfInput" class="custom-file-upload">
+                            <span id="imgToPdfLabel">Select Image File (JPG/PNG)</span>
+                        </label>
+                        <button type="button" class="clear-file-btn" onclick="clearFileInput('imgToPdfInput', 'imgToPdfLabel')">✕</button>
+                        <input hidden id="imgToPdfInput" type="file" accept="image/jpeg, image/png" class="hidden" onchange="updateFileName('imgToPdfInput', 'imgToPdfLabel')" />
+                    </div>
+
+                    <button onclick="convertImageToPDF()"
+                        class="btn btn-process bg-teal-500 hover:bg-teal-400">
+                        Process Image to PDF
+                    </button>
+                </div>
+
+                <div class="tool-card">
+                    <h3 class="text-3xl font-bold mb-6 text-lime-300">📏 Image Data Stream Reduction</h3>
+                    <p class="text-sm text-slate-400 mb-6">Compress a JPG image iteratively to meet a specific **Target Size (KB)** using quality reduction.</p>
+
+                    <div class="file-input-wrapper mb-4" style="margin-bottom: 10px;">
+                        <label for="imgSizeInput" class="custom-file-upload">
+                            <span id="imgSizeLabel">Select Image File (JPG)</span>
+                        </label>
+                        <button type="button" class="clear-file-btn" onclick="clearFileInput('imgSizeInput', 'imgSizeLabel')">✕</button>
+                        <input hidden id="imgSizeInput" type="file" accept="image/jpeg" class="hidden" onchange="updateFileName('imgSizeInput', 'imgSizeLabel')" />
+                    </div>
+
+                    <input id="targetImgKB" type="number" placeholder="Target Size (KB) - Minimum 10 KB"
+                        class="w-full mb-5 futuristic-input" min="10"  style="margin-bottom: 10px;"/>
+
+                    <button onclick="compressImageToTarget()"
+                        class="btn btn-process bg-lime-500 hover:bg-lime-400">
+                        Optimize Image Size
+                    </button>
+                </div>
+            </div>
+
+            <div hidden id="content-pdf" class="tab-content hidden grid grid-cols-1 lg:grid-cols-2 gap-10">
+                
+                <div class="tool-card">
+                    <h3 class="text-3xl font-bold mb-5 text-indigo-300">📄 PDF Compression Level (Rendering Quality)</h3>
+                    <p class="text-sm text-red-400 mb-4">⚠️ **Warning:** This tool renders all pages to compressed JPEG images at the chosen quality. **Vector/Text data is converted to images, losing text selection ability.**</p>
+
+                    <div class="file-input-wrapper mb-4" style="margin-bottom: 10px;">
+                        <label for="pdfInputLevel" class="custom-file-upload">
+                            <span id="pdfInputLevelLabel">Select PDF File</span>
+                        </label>
+                        <button type="button" class="clear-file-btn" onclick="clearFileInput('pdfInputLevel', 'pdfInputLevelLabel')">✕</button>
+                        <input hidden id="pdfInputLevel" type="file" accept="application/pdf" class="hidden" onchange="updateFileName('pdfInputLevel', 'pdfInputLevelLabel')" />
+                    </div>
+
+                    <select id="pdfQualityLevel" class="w-full mb-5 futuristic-input"  style="margin-bottom: 10px;">
+                        <option value="0.9">Minimal Compression (90% Quality) - Best Fidelity</option>
+                        <option value="0.7" selected>Medium Compression (70% Quality) - Recommended</option>
+                        <option value="0.5">High Compression (50% Quality)</option>
+                        <option value="0.3">Extreme Compression (30% Quality) - Lowest Fidelity</option>
+                    </select>
+
+                    <button onclick="compressPDFByRenderingQuality('pdfInputLevel', 'pdfQualityLevel')"
+                        class="btn btn-process bg-indigo-500 hover:bg-indigo-400">
+                        Apply Quality Compression
+                    </button>
+                </div>
+
+                <div class="tool-card">
+                    <h3 class="text-3xl font-bold mb-5 text-pink-300">🎯 PDF Target Size Simulation (Iterative)</h3>
+                    <p class="text-sm text-red-400 mb-4">⚠️ **Warning:** Attempts to meet the target KB by trying different JPEG rendering qualities (0.9, 0.7, 0.5, 0.3). **Text/Vectors converted to images.**</p>
+
+                    <div class="file-input-wrapper mb-4" style="margin-bottom: 10px;">
+                        <label for="pdfInputTarget" class="custom-file-upload">
+                            <span id="pdfInputTargetLabel">Select PDF File</span>
+                        </label>
+                        <button type="button" class="clear-file-btn" onclick="clearFileInput('pdfInputTarget', 'pdfInputTargetLabel')">✕</button>
+                        <input hidden id="pdfInputTarget" type="file" accept="application/pdf" class="hidden" onchange="updateFileName('pdfInputTarget', 'pdfInputTargetLabel')" />
+                    </div>
+
+                    <input id="targetPdfKB" type="number" placeholder="Target Size (KB) - Minimum 10 KB"
+                        class="w-full mb-5 futuristic-input" min="10"  style="margin-bottom: 10px;"/>
+
+                    <button onclick="compressPDFByTargetRendering()"
+                        class="btn btn-process bg-pink-500 hover:bg-pink-400">
+                        Initiate Target Reduction
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
