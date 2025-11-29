@@ -7,10 +7,11 @@ if (window.pdfjsLib) {
     window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.js';
 }
 
+// 1. STATUS ELEMENT DEFINITION (Required for setStatus to work)
 const statusEl = document.getElementById('status-message');
 
 /**
- * Displays a non-blocking status message.
+ * 2. RE-ADDED: Displays a non-blocking status message.
  * @param {string} message The message to display.
  * @param {'success'|'error'|'processing'|'hidden'} type The type of message.
  */
@@ -20,15 +21,22 @@ function setStatus(message, type = 'processing') {
     
     if (type === 'hidden') {
         statusEl.classList.add('hidden');
+        // Clear any pending timeout when hiding
+        clearTimeout(statusEl.dataset.timeoutId);
+        statusEl.hidden = true;
         return;
     }
 
     statusEl.classList.remove('hidden');
     statusEl.classList.add(`status-${type}`);
+    statusEl.hidden = false;
     
     // Auto-hide success/error messages after a delay
     if (type === 'success' || type === 'error') {
-        setTimeout(() => setStatus('', 'hidden'), 8000);
+        // Clear previous timeout before setting a new one
+        clearTimeout(statusEl.dataset.timeoutId);
+        const timeoutId = setTimeout(() => setStatus('', 'hidden'), 8000);
+        statusEl.dataset.timeoutId = timeoutId;
     }
 }
 
@@ -46,9 +54,17 @@ function showTab(tabId) {
 
     // Show selected content and activate button
     document.getElementById(`content-${tabId}`).classList.remove('hidden');
+    if(tabId == "image"){
+        document.getElementById(`content-${tabId}`).hidden = false;
+        document.getElementById(`content-pdf`).hidden = true;
+    }
+    else{
+        document.getElementById(`content-${tabId}`).hidden = false;
+        document.getElementById(`content-image`).hidden = true;
+    }
     document.getElementById(`tab-${tabId}`).classList.add('active');
     
-    // Clear any active status message when switching tabs
+    // 3. FIXED: Clear any active status message when switching tabs
     setStatus('', 'hidden');
 }
 
@@ -86,16 +102,17 @@ function clearFileInput(inputId, labelId) {
     // Reset the label text
     label.textContent = getFileDefaultLabel(inputId);
     
-    // Clear status when a file is cleared
+    // 4. FIXED: Clear status when a file is cleared
     setStatus('', 'hidden');
 }
 
 
 // Read file as DataURL
 function readFileAsDataURL(file) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => { // Added reject for robustness
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
         reader.readAsDataURL(file);
     });
 }
@@ -122,6 +139,7 @@ function downloadFile(data, filename) {
     a.click();
 
     URL.revokeObjectURL(url);
+    // 5. FIXED: Add status feedback for download
     setStatus(`✅ File successfully generated and downloaded as **${filename}**`, 'success');
 }
 
@@ -130,9 +148,9 @@ function downloadFile(data, filename) {
 //--------------------------------------------
 async function convertImageToPDF() {
     const input = document.getElementById("imgToPdfInput").files[0];
-    if (!input) return setStatus("Error: Please choose an image file!", 'error');
+    if (!input) return setStatus("Error: Please choose an image file!", 'error'); // FIXED: Replaced alert
     
-    setStatus("Processing... Converting image to PDF format.", 'processing');
+    setStatus("Processing... Converting image to PDF format.", 'processing'); // FIXED: Replaced alert
 
     const file = input;
     const reader = new FileReader();
@@ -152,28 +170,29 @@ async function convertImageToPDF() {
                 const pdfMargin = 10; 
                 const maxPdfWidth = 210 - 2 * pdfMargin;
                 let pdfWidth = maxPdfWidth;
-                let pdfHeight = maxPdfWidth / ratio;
                 
-                // Adjust for landscape orientation if necessary
-                if (ratio > (210/297)) {
-                    pdfHeight = maxPdfWidth / ratio;
-                } else {
-                    // Portrait or similar aspect ratio
-                    pdfHeight = maxPdfWidth / ratio;
+                // Calculate height based on ratio, scaled to max width
+                let pdfHeight = maxPdfWidth / ratio;
+
+                // Scale down if height exceeds A4 height, while maintaining aspect ratio
+                const maxPdfHeight = 297 - 2 * pdfMargin;
+                if (pdfHeight > maxPdfHeight) {
+                    pdfHeight = maxPdfHeight;
+                    pdfWidth = maxPdfHeight * ratio;
                 }
 
                 pdf.addImage(img, "JPEG", pdfMargin, pdfMargin, pdfWidth, pdfHeight);
                 pdf.save("ConvertedImage.pdf");
-                setStatus(`✅ Successfully converted **${file.name}** to PDF.`, 'success');
+                setStatus(`✅ Successfully converted **${file.name}** to PDF.`, 'success'); // FIXED: Replaced alert
 
             } catch (e) {
-                setStatus(`❌ Conversion Failed: ${e.message}`, 'error');
+                setStatus(`❌ Conversion Failed: ${e.message}`, 'error'); // FIXED: Replaced alert
             }
         };
         img.src = reader.result;
     };
 
-    reader.onerror = () => setStatus("❌ Error reading the image file.", 'error');
+    reader.onerror = () => setStatus("❌ Error reading the image file.", 'error'); // FIXED: Replaced alert
 
     reader.readAsDataURL(file);
 }
@@ -185,10 +204,10 @@ async function compressImageToTarget() {
     const file = document.getElementById("imgSizeInput").files[0];
     const targetKB = Number(document.getElementById("targetImgKB").value);
 
-    if (!file) return setStatus("Error: Select an image file!", 'error');
-    if (!targetKB || targetKB < 10) return setStatus("Error: Enter a valid target size (minimum 10 KB)!", 'error');
+    if (!file) return setStatus("Error: Select an image file!", 'error'); // FIXED: Replaced alert
+    if (!targetKB || targetKB < 10) return setStatus("Error: Enter a valid target size (minimum 10 KB)!", 'error'); // FIXED: Replaced alert
     
-    setStatus(`Processing... Target size: ${targetKB} KB. Initiating iterative compression.`, 'processing');
+    setStatus(`Processing... Target size: ${targetKB} KB. Initiating iterative compression.`, 'processing'); // FIXED: Replaced alert
 
     let quality = 0.95;
     let result;
@@ -221,15 +240,15 @@ async function compressImageToTarget() {
         
         const finalSizeKB = Math.round(result.length / 1024);
         if (finalSizeKB > targetKB) {
-             setStatus(`⚠️ Target size not fully met. Achieved ${finalSizeKB} KB (Target: ${targetKB} KB) at minimum quality. Downloading result.`, 'error');
+             setStatus(`⚠️ Target size not fully met. Achieved ${finalSizeKB} KB (Target: ${targetKB} KB) at minimum quality. Downloading result.`, 'error'); // FIXED: Replaced alert
         } else {
-             setStatus(`✅ Target met! Achieved ${finalSizeKB} KB at ${Math.round(quality * 100)}% quality. Downloading result.`, 'success');
+             setStatus(`✅ Target met! Achieved ${finalSizeKB} KB at ${Math.round(quality * 100)}% quality. Downloading result.`, 'success'); // FIXED: Replaced alert
         }
 
         downloadFile(dataURLToBlob(result), "CompressedImage.jpg");
 
     } catch (e) {
-        setStatus(`❌ Compression Failed: ${e.message}`, 'error');
+        setStatus(`❌ Compression Failed: ${e.message}`, 'error'); // FIXED: Replaced alert
     }
 }
 
@@ -248,14 +267,15 @@ async function performPdfRenderingCompression(file, quality) {
     const canvas = document.getElementById('pdfCanvas');
     const context = canvas.getContext('2d');
     
-    const totalPages = pdf.numPages;
+    const totalPages = pdf.numPages; // Get total pages for feedback
 
     // Iterate through pages
     for (let i = 1; i <= totalPages; i++) {
+        // FIXED: Add processing feedback
         setStatus(`Processing page ${i} of ${totalPages}... Rendering at ${Math.round(quality * 100)}% quality.`, 'processing');
 
         const page = await pdf.getPage(i);
-        // Use a slightly higher scale for better image quality - 2.0 is often a good balance.
+        // Use a scale of 2.0 for better results than the original 1.5
         const viewport = page.getViewport({ scale: 2.0 }); 
 
         // Set canvas dimensions
@@ -300,22 +320,22 @@ async function compressPDFByRenderingQuality(inputId, qualityId) {
     const input = document.getElementById(inputId);
     const quality = parseFloat(document.getElementById(qualityId).value);
 
-    if (!input.files.length) return setStatus("Error: Select a PDF file!", 'error');
+    if (!input.files.length) return setStatus("Error: Select a PDF file!", 'error'); // FIXED: Replaced alert
     const file = input.files[0];
     
-    setStatus(`Initiating PDF compression at ${Math.round(quality * 100)}% rendering quality...`, 'processing');
-    
+    setStatus(`Initiating PDF compression at ${Math.round(quality * 100)}% rendering quality...`, 'processing'); // FIXED: Replaced alert
+
     try {
         const compressedBytes = await performPdfRenderingCompression(file, quality);
         
         const sizeKB = Math.round(compressedBytes.byteLength / 1024);
         downloadFile(compressedBytes, "compressed_rendered_quality.pdf");
         
-        setStatus(`✅ Compression complete! Final size: ${sizeKB} KB at ${Math.round(quality * 100)}% quality.`, 'success');
+        setStatus(`✅ Compression complete! Final size: ${sizeKB} KB at ${Math.round(quality * 100)}% quality.`, 'success'); // FIXED: Replaced alert
 
     } catch (e) {
         console.error("Compression Failed:", e);
-        setStatus(`❌ PDF compression failed. Error: ${e.message}`, 'error');
+        setStatus(`❌ PDF compression failed. Error: ${e.message}`, 'error'); // FIXED: Replaced alert
     }
 }
 
@@ -327,10 +347,10 @@ async function compressPDFByTargetRendering() {
     const input = document.getElementById("pdfInputTarget");
     const targetKB = parseInt(document.getElementById("targetPdfKB").value);
 
-    if (!input.files.length) return setStatus("Error: Select a PDF file!", 'error');
-    if (!targetKB || targetKB < 10) return setStatus("Error: Enter a valid target size (minimum 10 KB)", 'error');
+    if (!input.files.length) return setStatus("Error: Select a PDF file!", 'error'); // FIXED: Replaced alert
+    if (!targetKB || targetKB < 10) return setStatus("Error: Enter a valid target size (minimum 10 KB)", 'error'); // FIXED: Replaced alert
     
-    setStatus(`Initiating iterative compression attempt. Target KB: ${targetKB}.`, 'processing');
+    setStatus(`Initiating iterative compression attempt. Target KB: ${targetKB}.`, 'processing'); // FIXED: Replaced alert
 
     const file = input.files[0];
     let compressedBytes;
@@ -341,25 +361,25 @@ async function compressPDFByTargetRendering() {
 
     try {
         for (const quality of qualities) {
-            setStatus(`Attempting compression at ${Math.round(quality * 100)}% quality...`, 'processing');
+            setStatus(`Attempting compression at ${Math.round(quality * 100)}% quality...`, 'processing'); // FIXED: Replaced alert
             
             compressedBytes = await performPdfRenderingCompression(file, quality);
             sizeKB = Math.round(compressedBytes.byteLength / 1024);
 
             if (sizeKB <= targetKB) {
-                setStatus(`✅ Target met at ${Math.round(quality * 100)}% quality! Compressed size: ${sizeKB} KB. Downloading file.`, 'success');
+                setStatus(`✅ Target met at ${Math.round(quality * 100)}% quality! Compressed size: ${sizeKB} KB. Downloading file.`, 'success'); // FIXED: Replaced alert
                 downloadFile(compressedBytes, "compressed_target_success.pdf");
                 return;
             }
-            setStatus(`Size at ${Math.round(quality * 100)}% quality: ${sizeKB} KB (Still above target). Moving to next level.`, 'processing');
+            setStatus(`Size at ${Math.round(quality * 100)}% quality: ${sizeKB} KB (Still above target). Moving to next level.`, 'processing'); // FIXED: Replaced alert
         }
 
         // Final step: Alert failure and download the smallest achieved file (from the last quality tried)
-        setStatus(`❌ Compression failed to reach the target KB (${targetKB} KB). Lowest achieved size was ${sizeKB} KB at 30% rendering quality. Downloading this result.`, 'error');
+        setStatus(`❌ Compression failed to reach the target KB (${targetKB} KB). Lowest achieved size was ${sizeKB} KB at 30% rendering quality. Downloading this result.`, 'error'); // FIXED: Replaced alert
         downloadFile(compressedBytes, "compressed_target_attempt.pdf");
 
     } catch (e) {
         console.error("Target Compression Failed:", e);
-        setStatus(`❌ PDF compression failed. Error: ${e.message}`, 'error');
+        setStatus(`❌ PDF compression failed. Error: ${e.message}`, 'error'); // FIXED: Replaced alert
     }
 }

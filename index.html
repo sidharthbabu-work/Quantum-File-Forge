@@ -192,15 +192,15 @@
 
 <body class="p-8 md:p-12">
 
-    <h1 class="text-5xl md:text-6xl text-center font-extrabold mb-12 text-cyan-300 title-glow">
+    <h1 style="width: 100%; text-align: center;" class="text-5xl md:text-6xl text-center font-extrabold mb-12 text-cyan-300 title-glow">
         ⚡ Quantum File Forge ⚡
     </h1>
     
-    <canvas id="pdfCanvas"></canvas>
+    <canvas hidden id="pdfCanvas"></canvas>
 
     <div class="max-w-6xl mx-auto">
         
-        <div id="status-message" class="hidden"></div>
+        <div id="status-message" style="padding: 0%; text-align: center; vertical-align: middle; align-content: center;" hidden class="hidden"></div>
         
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
             <div id="tab-image" style="margin-left:12px; width:45%;" class="tab-btn active" onclick="showTab('image')">
