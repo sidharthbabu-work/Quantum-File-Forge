@@ -4,7 +4,7 @@
 
 // Set the worker URL for PDF.js (CRITICAL for it to work)
 if (window.pdfjsLib) {
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.js';
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdf.worker.js";
 }
 
 // 1. STATUS ELEMENT DEFINITION (Required for setStatus to work)
@@ -182,7 +182,7 @@ async function convertImageToPDF() {
                 }
 
                 pdf.addImage(img, "JPEG", pdfMargin, pdfMargin, pdfWidth, pdfHeight);
-                pdf.save("ConvertedImage.pdf");
+                pdf.save(file.name + "-ConvertedFromImage.pdf");
                 setStatus(`✅ Successfully converted **${file.name}** to PDF.`, 'success'); // FIXED: Replaced alert
 
             } catch (e) {
@@ -227,7 +227,10 @@ async function compressImageToTarget() {
         ctx.drawImage(img, 0, 0);
 
 
-        while (quality >= 0.05) {
+        while (quality >= 0.01) {
+            if (quality === 0.01) {
+                throw new Error("⚠️ Target size cannot be achieved!");
+            }
             result = canvas.toDataURL("image/jpeg", quality);
 
             const sizeKB = Math.round(result.length / 1024);
@@ -235,7 +238,7 @@ async function compressImageToTarget() {
 
             if (sizeKB <= targetKB) break;
 
-            quality = Math.max(0.05, quality - 0.05);
+            quality = Math.max(0.01, quality - 0.01);
         }
         
         const finalSizeKB = Math.round(result.length / 1024);
@@ -245,7 +248,7 @@ async function compressImageToTarget() {
              setStatus(`✅ Target met! Achieved ${finalSizeKB} KB at ${Math.round(quality * 100)}% quality. Downloading result.`, 'success'); // FIXED: Replaced alert
         }
 
-        downloadFile(dataURLToBlob(result), "CompressedImage.jpg");
+        downloadFile(dataURLToBlob(result), file.name + "-Compressed_target(" + targetKB + "KB).jpg");
 
     } catch (e) {
         setStatus(`❌ Compression Failed: ${e.message}`, 'error'); // FIXED: Replaced alert
@@ -329,7 +332,7 @@ async function compressPDFByRenderingQuality(inputId, qualityId) {
         const compressedBytes = await performPdfRenderingCompression(file, quality);
         
         const sizeKB = Math.round(compressedBytes.byteLength / 1024);
-        downloadFile(compressedBytes, "compressed_rendered_quality.pdf");
+        downloadFile(compressedBytes, file.name + `-Compressed_rendered_quality(${qualityId}).pdf`);
         
         setStatus(`✅ Compression complete! Final size: ${sizeKB} KB at ${Math.round(quality * 100)}% quality.`, 'success'); // FIXED: Replaced alert
 
@@ -357,7 +360,7 @@ async function compressPDFByTargetRendering() {
     let sizeKB;
     
     // Ordered qualities to try: High to Low
-    const qualities = [0.9, 0.7, 0.5, 0.3];
+    const qualities = [0.9, 0.7, 0.5, 0.3, 0.1];
 
     try {
         for (const quality of qualities) {
@@ -368,7 +371,7 @@ async function compressPDFByTargetRendering() {
 
             if (sizeKB <= targetKB) {
                 setStatus(`✅ Target met at ${Math.round(quality * 100)}% quality! Compressed size: ${sizeKB} KB. Downloading file.`, 'success'); // FIXED: Replaced alert
-                downloadFile(compressedBytes, "compressed_target_success.pdf");
+                downloadFile(compressedBytes, file.name+ `-Compressed_target_(${targetKB} KB).pdf`);
                 return;
             }
             setStatus(`Size at ${Math.round(quality * 100)}% quality: ${sizeKB} KB (Still above target). Moving to next level.`, 'processing'); // FIXED: Replaced alert
@@ -376,7 +379,7 @@ async function compressPDFByTargetRendering() {
 
         // Final step: Alert failure and download the smallest achieved file (from the last quality tried)
         setStatus(`❌ Compression failed to reach the target KB (${targetKB} KB). Lowest achieved size was ${sizeKB} KB at 30% rendering quality. Downloading this result.`, 'error'); // FIXED: Replaced alert
-        downloadFile(compressedBytes, "compressed_target_attempt.pdf");
+        downloadFile(compressedBytes, file.name + `-Compressed_target_attempt(${sizeKB} KB).pdf`);
 
     } catch (e) {
         console.error("Target Compression Failed:", e);

@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>⚡ Quantum File Forge ⚡</title>
     <link rel="icon" type="image/png" href="favicon.png">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="vendor/tailwind.min.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.js"></script> 
+    <script src="vendor/jspdf.umd.min.js"></script>
+    <script src="vendor/pdf-lib.min.js"></script>
+    <script src="vendor/pdf.js"></script>
 
     <style>
         body {
@@ -273,7 +273,8 @@
                         <option value="0.9">Minimal Compression (90% Quality) - Best Fidelity</option>
                         <option value="0.7" selected>Medium Compression (70% Quality) - Recommended</option>
                         <option value="0.5">High Compression (50% Quality)</option>
-                        <option value="0.3">Extreme Compression (30% Quality) - Lowest Fidelity</option>
+                        <option value="0.3">Extreme Compression (30% Quality) - Low Fidelity</option>
+                        <option value="0.1">Extreme High Compression (10% Quality) - Lowest Fidelity</option>
                     </select>
 
                     <button onclick="compressPDFByRenderingQuality('pdfInputLevel', 'pdfQualityLevel')"
@@ -284,7 +285,7 @@
 
                 <div class="tool-card">
                     <h3 class="text-3xl font-bold mb-5 text-pink-300">🎯 PDF Target Size Simulation (Iterative)</h3>
-                    <p class="text-sm text-red-400 mb-4">⚠️ **Warning:** Attempts to meet the target KB by trying different JPEG rendering qualities (0.9, 0.7, 0.5, 0.3). **Text/Vectors converted to images.**</p>
+                    <p class="text-sm text-red-400 mb-4">⚠️ **Warning:** Attempts to meet the target KB by trying different JPEG rendering qualities (0.9, 0.7, 0.5, 0.3, 0.1). **Text/Vectors converted to images.**</p>
 
                     <div class="file-input-wrapper mb-4" style="margin-bottom: 10px;">
                         <label for="pdfInputTarget" class="custom-file-upload">
