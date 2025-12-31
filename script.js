@@ -386,19 +386,3 @@ async function compressPDFByTargetRendering() {
         setStatus(`❌ PDF compression failed. Error: ${e.message}`, 'error'); // FIXED: Replaced alert
     }
 }
-
-  const adSections = document.querySelectorAll('.ad');
-
-  adSections.forEach((section) => {
-    const observer = new MutationObserver(() => {
-      if (section.style.height === 'auto') {
-        section.style.setProperty('height', '120px', 'important');
-        section.style.setProperty('min-height', '120px', 'important');
-      }
-    });
-
-    observer.observe(section, { 
-      attributes: true, 
-      attributeFilter: ['style'] 
-    });
-  });
