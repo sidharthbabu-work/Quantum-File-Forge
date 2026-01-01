@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | ⚡ Quantum File Forge ⚡</title>
+    <link rel="stylesheet" href="vendor/tailwind.min.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body { background: #0d1117; color: #e5e7eb; font-family: 'Inter', sans-serif; }
+        .title-glow { text-shadow: 0 0 15px rgba(56, 189, 248, 0.4); }
+        .content-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.9), rgba(17, 24, 39, 0.9));
+            border: 1px solid #334155;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body class="p-8 md:p-12">
+    <nav class="max-w-6xl mx-auto mb-12 flex justify-start space-x-6 text-cyan-400 font-bold">
+        <a href="index.html" class="hover:text-white transition">← Back to Tools</a>
+    </nav>
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl md:text-5xl font-extrabold mb-8 text-cyan-300 title-glow">About Quantum File Forge</h1>
+        
+        <div class="content-card p-8 md:p-10 space-y-8 leading-relaxed">
+            <section>
+                <h2 class="text-2xl font-bold text-teal-300 mb-4">Our Mission: Privacy-First Utility</h2>
+                <p>
+                    Quantum File Forge was developed to solve a common problem: the security risk of uploading sensitive documents to remote servers for simple conversion tasks. We believe that your data belongs to you. That is why our platform utilizes advanced client-side JavaScript to process every file directly within your browser's memory.
+                </p>
+            </section>
+
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold text-lime-300 mb-2">Browser-Based Processing</h3>
+                    <p class="text-sm text-slate-400">
+                        By leveraging technologies like <strong>WebAssembly</strong> and libraries such as <code>pdf-lib</code> and <code>jsPDF</code>, we perform heavy-duty file manipulations without a backend server. This ensures zero data latency and 100% privacy.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-pink-300 mb-2">Iterative Optimization</h3>
+                    <p class="text-sm text-slate-400">
+                        Our "Target Size" tool uses a unique recursive algorithm that adjusts rendering quality in steps (90% down to 10%) to help users meet strict file-size requirements for government and legal portals.
+                    </p>
+                </div>
+            </section>
+
+            <section class="border-t border-slate-700 pt-8">
+                <h2 class="text-2xl font-bold text-cyan-300 mb-4">Why Choose Our Forge?</h2>
+                <ul class="list-disc pl-5 space-y-3 text-slate-300">
+                    <li><strong>No Upload Limits:</strong> Since the processing happens on your hardware, we don't restrict file counts.</li>
+                    <li><strong>Zero Data Retention:</strong> We cannot see, store, or sell your files because they never reach our servers.</li>
+                    <li><strong>Precision Control:</strong> Specify your exact target KB, and our engine will find the best quality-to-size ratio for you.</li>
+                </ul>
+            </section>
+
+            <section class="bg-slate-900/50 p-6 rounded-xl border border-slate-700">
+                <h3 class="text-lg font-bold text-gray-200 mb-2">Contact Information</h3>
+                <p class="text-sm">For technical support or inquiries, please reach out to our lead developer at:</p>
+                <p class="text-cyan-400 font-mono mt-2">sidharth.babu.work@gmail.com</p>
+            </section>
+        </div>
+    </div>
+
+    <footer class="max-w-4xl mx-auto mt-12 text-center text-xs text-slate-500">
+        &copy; 2025 Quantum File Forge. All processing is local. No data is stored.
+    </footer>
+</body>
+</html>

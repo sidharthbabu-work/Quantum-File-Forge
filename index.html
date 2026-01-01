@@ -81,6 +81,7 @@
         
         /* Hover effect for process buttons (futuristic pulse) */
         .btn-process {
+            margin-bottom: 40px !important; 
             background: #06b6d4; /* Vivid Cyan */
             color: #0d1117;
         }
@@ -214,13 +215,17 @@
         }
 
         .ad {
-            margin: 15px 0;
-            padding: 10px;
+            margin-top: 80px !important;
+            margin-bottom: 80px !important;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5); /* Subtle background to distinguish from tool */
+            border-radius: 8px;
             text-align: center;
-            min-height: 120px;
-            border: 1px solid #ffffff; 
         }
     </style>
+
+    <meta name="description" content="Quantum File Forge: Professional-grade PDF compression and image conversion tools that run 100% in your browser. No uploads, total privacy.">
+    <meta name="keywords" content="PDF compressor, 200kb pdf, client-side conversion, secure file tools">
 
     <meta name="google-adsense-account" content="ca-pub-8093247107627485">
 
@@ -233,6 +238,11 @@
     <h1 style="width: 100%; text-align: center;" class="text-5xl md:text-6xl text-center font-extrabold mb-12 text-cyan-300 title-glow">
         ⚡ Quantum File Forge ⚡
     </h1>
+    <nav class="p-4 bg-slate-900 border-b border-slate-700 flex justify-center space-x-8 text-sm uppercase tracking-widest text-gray-400">
+        <a href="index.html" class="hover:text-cyan-400">Home</a>
+        <a href="about.html" class="hover:text-cyan-400">About the Forge</a>
+        <a href="privacy.html" class="hover:text-cyan-400">Privacy & Cookies</a>
+    </nav>
 
     <section class="ad">
         <ins class="adsbygoogle"
@@ -379,28 +389,56 @@
             }
         </script>
     </section>
+    <section class="max-w-4xl mx-auto mt-12 p-8 bg-slate-800 rounded-2xl shadow-2xl text-gray-300 border border-slate-700">
+        <h2 class="text-3xl font-bold text-cyan-400 mb-6 border-b border-slate-700 pb-2">Technical Guide: Understanding Quantum File Forge</h2>
+        
+        <div class="prose prose-invert max-w-none space-y-6">
+            <p>
+                <strong>Quantum File Forge</strong> is a sophisticated browser-based utility designed for advanced PDF manipulation and image optimization. Unlike traditional online converters, our "Quantum" engine operates entirely on the client side, meaning your sensitive documents never leave your device.
+            </p>
+
+            <h3 class="text-xl font-semibold text-teal-300">How Our PDF Target Reduction Works</h3>
+            <p>
+                Our "Target KB" compression uses a recursive rendering algorithm. It utilizes the <code>pdf.js</code> library to rasterize each page of your PDF into high-definition canvas elements. These are then converted into JPEG streams via <code>jsPDF</code> at varying quality levels until the file size matches your specific target (e.g., 200KB or 500KB). This method is significantly more effective for government portals and legal filings than standard "metadata stripping."
+            </p>
+
+            <h3 class="text-xl font-semibold text-teal-300">Privacy-First Architecture</h3>
+            <p>
+                Most file tools require you to upload files to a remote server, posing a significant security risk. Quantum File Forge leverages <strong>WebAssembly</strong> and <strong>PDF-Lib</strong> to perform heavy-duty processing locally. This ensures 100% data sovereignty for the user while providing the speed of a native application.
+            </p>
+
+            <h3 class="text-xl font-semibold text-teal-300">Frequently Asked Questions</h3>
+            <ul class="list-disc pl-6 space-y-2">
+                <li><strong>Why is my file still too big?</strong> If a PDF consists purely of high-resolution images, we recommend using our "Iterative Rendering" mode set to 300 DPI.</li>
+                <li><strong>Is there a file size limit?</strong> Since we use your browser's RAM, limits depend on your device. We recommend files under 100MB for optimal performance.</li>
+                <li><strong>Will the quality drop?</strong> Our engine prioritizes legibility. Even at 100KB targets, we use sharpening filters to ensure text remains readable.</li>
+            </ul>
+        </div>
+    </section>
     <script src="script.js"></script>
 </body>
 
 
 
-<footer class="footer">
+<footer class="footer mt-20 border-t border-slate-800 pt-8">
   <div class="footer-left">
-    <p class="title">Privacy Policy</p>
+    <p class="title text-cyan-400 font-bold">Legal & Privacy</p>
     <p class="text">
-      This site uses Google AdSense, which uses cookies to serve ads.
-      Third-party vendors, including Google, use cookies to serve ads
-      based on a user's prior visits to this website.
+      This site uses Google AdSense and cookies for ad personalization. 
+      Read our <a href="privacy.html" class="underline">Privacy Policy</a>.
     </p>
   </div>
 
   <div class="footer-right">
-    <p class="title">About This Tool</p>
-    <p class="text">This tool helps user change image/pdf size. Pdf conversion from image.</p>
+    <p class="title text-cyan-400 font-bold">Information</p>
+    <p class="text">
+      Learn more <a href="about.html" class="underline">About This Tool</a> and our 
+      client-side encryption.
+    </p>
   </div>
 
   <div class="footer-right2">
-    <p class="title">Contact</p>
+    <p class="title text-cyan-400 font-bold">Support</p>
     <p class="text">Email: sidharth.babu.work@gmail.com</p>
   </div>
 </footer>
