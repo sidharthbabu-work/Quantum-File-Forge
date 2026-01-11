@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self'; 
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.com https://*.net https://*.online; 
+        connect-src 'self' blob: data: https://*.com; 
+        img-src 'self' data: blob: https://*.com https://*.net; 
+        style-src 'self' 'unsafe-inline'; 
+        worker-src 'self' blob:;
+        frame-src 'self' https://*.com https://*.net https://*.online;
+    ">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>⚡ Quantum File Forge ⚡</title>
@@ -224,15 +233,7 @@
         }
     </style>
 
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self'; 
-        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://nap5k.com; 
-        connect-src 'self' blob:; 
-        img-src 'self' data: blob:; 
-        style-src 'self' 'unsafe-inline'; 
-        worker-src 'self' blob:;
-        frame-src 'self' https://nap5k.com;
-    ">
+
     <meta name="description" content="Quantum File Forge: Professional-grade PDF compression and image conversion tools that run 100% in your browser. No uploads, total privacy.">
     <meta name="keywords" content="PDF compressor, 200kb pdf, client-side conversion, secure file tools">
 </head>
