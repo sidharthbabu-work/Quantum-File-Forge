@@ -359,30 +359,53 @@ async function compressPDFByTargetRendering() {
     let compressedBytes;
     let sizeKB;
     
-    // Ordered qualities to try: High to Low
-    const qualities = [0.9, 0.7, 0.5, 0.3, 0.1];
+    // Define the range constants
+    const MIN_QUALITY = 0.1;
+    const MAX_QUALITY = 1.0;
+    const PRECISION = 0.01;
 
     try {
-        for (const quality of qualities) {
-            setStatus(`Attempting compression at ${Math.round(quality * 100)}% quality...`, 'processing'); // FIXED: Replaced alert
-            
-            compressedBytes = await performPdfRenderingCompression(file, quality);
-            sizeKB = Math.round(compressedBytes.byteLength / 1024);
+        let low = MIN_QUALITY;
+        let high = MAX_QUALITY;
+        let bestQuality = MIN_QUALITY;
+        let bestBytes = null;
+        let lastSizeKB = 0;
 
-            if (sizeKB <= targetKB) {
-                setStatus(`✅ Target met at ${Math.round(quality * 100)}% quality! Compressed size: ${sizeKB} KB. Downloading file.`, 'success'); // FIXED: Replaced alert
-                downloadFile(compressedBytes, file.name+ `-Compressed_target_(${targetKB} KB).pdf`);
-                return;
+        // Binary search logic
+        while (low <= high) {
+            // Calculate middle point and round to 2 decimal places
+            let mid = Math.round(((low + high) / 2) * 100) / 100;
+            
+            setStatus(`Testing ${Math.round(mid * 100)}% quality...`, 'processing');
+
+            let currentBytes = await performPdfRenderingCompression(file, mid);
+            let currentSizeKB = Math.round(currentBytes.byteLength / 1024);
+
+            if (currentSizeKB <= targetKB) {
+                // This quality works! Save it and try to find a HIGHER quality (better looking)
+                bestQuality = mid;
+                bestBytes = currentBytes;
+                lastSizeKB = currentSizeKB;
+                low = mid + PRECISION; 
+            } else {
+                // Still too big, we MUST go lower in quality
+                high = mid - PRECISION;
+                // Keep track of the smallest version found so far just in case
+                bestBytes = currentBytes; 
+                lastSizeKB = currentSizeKB;
             }
-            setStatus(`Size at ${Math.round(quality * 100)}% quality: ${sizeKB} KB (Still above target). Moving to next level.`, 'processing'); // FIXED: Replaced alert
         }
 
-        // Final step: Alert failure and download the smallest achieved file (from the last quality tried)
-        setStatus(`❌ Compression failed to reach the target KB (${targetKB} KB). Lowest achieved size was ${sizeKB} KB at 30% rendering quality. Downloading this result.`, 'error'); // FIXED: Replaced alert
-        downloadFile(compressedBytes, file.name + `-Compressed_target_attempt(${sizeKB} KB).pdf`);
+        if (lastSizeKB <= targetKB) {
+            setStatus(`✅ Target met at ${Math.round(bestQuality * 100)}% quality! Size: ${lastSizeKB} KB.`, 'success');
+            downloadFile(bestBytes, `${file.name}-Compressed_${lastSizeKB}KB.pdf`);
+        } else {
+            setStatus(`❌ Target ${targetKB}KB not reachable. Best achieved: ${lastSizeKB}KB.`, 'error');
+            downloadFile(bestBytes, `${file.name}-Smallest_Attempt.pdf`);
+        }
 
     } catch (e) {
         console.error("Target Compression Failed:", e);
-        setStatus(`❌ PDF compression failed. Error: ${e.message}`, 'error'); // FIXED: Replaced alert
+        setStatus(`❌ Error: ${e.message}`, 'error');
     }
 }
