@@ -31,6 +31,18 @@
                 <p>
                     At Quantum File Forge, we prioritize your document security. All file processing, including PDF compression and image conversion, occurs locally in your browser using JavaScript. Your files are never uploaded to our servers, stored, or seen by us.
                 </p>
+                <h3 style="margin-top: 5px;" class="text-cyan-400 font-bold mb-2">Automatic Cache Clearance</h3>
+                <p class="text-sm">
+                    To prevent sensitive data residue, we use <code>URL.revokeObjectURL</code> and manual garbage collection hints to wipe document data from your browser's temporary memory immediately after your download is triggered.
+                </p>
+                <h3 style="margin-top: 5px;" class="text-cyan-400 font-bold mb-2">Sandboxed Environment</h3>
+                <p class="text-sm">
+                    We utilize a strict <strong>Content Security Policy (CSP)</strong> and isolated iframes to ensure that third-party scripts (such as advertisements) cannot access your document data or monitor your local processing activity.
+                </p>
+                <h3 style="margin-top: 5px;"  class="text-cyan-400 font-bold mb-2">Zero-Data Transit</h3>
+                <p class="text-sm">
+                    Because we process files by converting bytes directly in your RAM rather than using network-based API calls, your sensitive information remains physically locked within your device during the entire session.
+                </p>
             </section>
 
             <section>
