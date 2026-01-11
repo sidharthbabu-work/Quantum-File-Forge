@@ -303,8 +303,14 @@ async function performPdfRenderingCompression(file, quality) {
         // Compress the rendered page image using the canvas API
         const dataUrl = canvas.toDataURL('image/jpeg', quality);
         
-        // Convert DataURL to ArrayBuffer
-        const jpegBytes = await fetch(dataUrl).then(res => res.arrayBuffer());
+        // 2. FIXED: Convert DataURL to Uint8Array WITHOUT using fetch()
+        const base64Data = dataUrl.split(',')[1];
+        const binaryStr = atob(base64Data);
+        const len = binaryStr.length;
+        const jpegBytes = new Uint8Array(len);
+        for (let j = 0; j < len; j++) {
+            jpegBytes[j] = binaryStr.charCodeAt(j);
+        }
 
         // Embed the compressed JPEG into the new PDF
         const jpegImage = await pdfDocLib.embedJpg(jpegBytes);
