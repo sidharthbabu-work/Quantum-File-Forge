@@ -136,9 +136,17 @@ function downloadFile(data, filename) {
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
+    document.body.appendChild(a); // Briefly append to ensure it works in all browsers
     a.click();
+    document.body.removeChild(a);
 
-    URL.revokeObjectURL(url);
+    // CRITICAL: Wipe the data from the browser cache/memory immediately
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+        // Hint the garbage collector to clear the large data object
+        data = null; 
+    }, 100);
+
     // 5. FIXED: Add status feedback for download
     setStatus(`✅ File successfully generated and downloaded as **${filename}**`, 'success');
 }
